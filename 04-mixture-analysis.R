@@ -17,7 +17,7 @@ library(dplyr)
 library(patchwork)
 library(gWQS)
 
-source("C:/Users/camer/OneDrive/Documents/SPH/MESA_exposome/scripts/get-weights-plot.R")
+source("~/R/MESA-air-pollution/functions/get-weights-plot.R")
 
 
 ### 1. Prep data for analysis --------------------------------------------------
