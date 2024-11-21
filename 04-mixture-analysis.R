@@ -42,7 +42,9 @@ gm_vol_fit <- qgcomp.glm.noboot(as.formula(paste0("gm_vol", " ~ ", paste0(c(Xnm,
                                  expnms = Xnm,
                                  df, family = gaussian(), q = 4, bayes = TRUE)
 
-
+wm_fa_fit <- qgcomp.glm.noboot(as.formula(paste0("wm_fa", " ~ ", paste0(c(Xnm, covars), collapse = " + "))),
+                                expnms = Xnm,
+                                df, family = gaussian(), q = 4, bayes = TRUE)
 
 ### 3. gWQS --------------------------------------------------------------------
 
@@ -51,6 +53,10 @@ gm_vol_wqs <- gwqs(as.formula(paste0("gm_vol", " ~ ", paste0(c("wqs", covars, "i
                     q = 10, validation = 0.6, b = 5, b1_pos = FALSE, rh = 5,
                     family = "gaussian", seed = 2016)
 
+wm_fa_wqs <- gwqs(as.formula(paste0("wm_fa", " ~ ", paste0(c("wqs", covars), collapse = " + "))), 
+                   mix_name = Xnm, data = df, 
+                   q = 10, validation = 0.6, b = 5, b1_pos = FALSE, rh = 5,
+                   family = "gaussian", seed = 2016)
 
 ### 4. Combined Plots ----------------------------------------------------------
 
@@ -74,6 +80,35 @@ ggsave("C:/Users/camer/OneDrive/Documents/SPH/MESA_exposome/air_pollution/output
        height = 6, 
        width = 16, 
        units = "in")
+
+
+# wm_fa
+p1 <- plot.weights(wm_fa_fit, data_labels[,1:2], group = "") + 
+  ggtitle(label = "Qgcomp weights",
+          subtitle = paste0("PSI: ", round(wm_fa_fit$psi, 4), "  (-PSI: ", round(wm_fa_fit$neg.psi, 4), ", +PSI: ", round(wm_fa_fit$pos.psi, 4), ")"))
+
+wqs_results <- summary(wm_fa_wqs)$coefficients[2, ] |> round(4)
+p2 <- gwqs_barplot(wm_fa_wqs) + 
+  ggtitle(label = "WQS weights (estimate)",
+          subtitle = paste0("WQS coefficient: ", wqs_results[1], ", 95% CI (", wqs_results[3], ", ", wqs_results[4], ")"))
+
+p3 <- gwqs_boxplot(wm_fa_wqs) + 
+  ggtitle(label = "WQS weights",
+          subtitle = paste0("WQS coefficient: ", wqs_results[1], ", 95% CI (", wqs_results[3], ", ", wqs_results[4], ")"))
+
+p1 + p2 + p3 + plot_layout(ncol = 3) + plot_annotation(title = "Air Pollution: associations with White Matter Fractional Anisotropy")
+
+ggsave("C:/Users/camer/OneDrive/Documents/SPH/MESA_exposome/air_pollution/output/mixture_analysis/wm_fa.png", 
+       dpi = 300, 
+       height = 6, 
+       width = 16, 
+       units = "in")
+
+
+
+
+
+
 
 
 ### 5. gWQS Positive and Negative ----------------------------------------------
